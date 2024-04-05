@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "openai": "^4.32.2",
+    "yargs": "^17.7.2"
+  },
+  "name": "treatmentor",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tmp009/treatmentor.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tmp009/treatmentor/issues"
+  },
+  "homepage": "https://github.com/tmp009/treatmentor#readme",
+  "description": ""
+}
