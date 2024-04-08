@@ -30,22 +30,36 @@ const args = argv._;
 const openai = new OpenAI();
 
 async function main() {
-    const scriptFile = JSON.parse(await fs.readFile(args[0]));
+    const scriptJson = JSON.parse(await fs.readFile(args[0]));
     const treatments = (await loadFilesFromDirectory(path.join(__dirname, 'treatments')))
                         .map(((text, index) => ( { role:'user', content: `EXAMPLE ${index + 1}: ${text}` }  ))
                     )
+    const scriptPrompt = jsonToString(scriptJson);
+    const stream = await scriptToTreatment(scriptPrompt, treatments)
+
+    let response = "";
+
+    for await (const chunk of stream) {
+        response += chunk.choices[0]?.delta?.content || ""
+        process.stdout.write(chunk.choices[0]?.delta?.content || "");
+    }
+
+    await fs.writeFile(argv.output, response.replace(/\*/g, ''))
 }
 
 async function scriptToTreatment(script, treatments) {
     const messages = [
-        {role:'system', content: 'You are film treatmentor. You will take example film treatments and a movie script then generate a film treatment for the script similar to the example treatments'},
+        {role:'system', content: 'You are film treatmentor. You will take example film treatments and a movie script then generate a film treatment for the script similar to the example treatments. Do not output markdown.'},
+        {role:'user', content: 'Treatments: ' + treatments},
+        {role:'user', content: 'Script content: ' + script},
+
     ]
 
     const stream = await openai.chat.completions.create({
         messages: messages,
         model: 'gpt-4-0125-preview',
         stream: true,
-        temperature: 1
+        temperature: 0.7
     });
 
     return stream
@@ -55,29 +69,6 @@ function jsonToString(scriptJson) {
     let script = "";
     const sceneText = []
 
-    /* {
-            "scene_number": "3",
-            "synopsis": "Opening credits over the dark Arctic Ocean.",
-            "time": "Evening",
-            "location": "Endless Sea",
-            "set": {
-                "type": [
-                    "EXT"
-                ],
-                "description": "The dark, undulating Arctic Ocean under a dark sky."
-            },
-            "elements": {
-                "camera": [
-                    "Camera flies above the water, tilts up."
-                ],
-                "camera_lighting_notes": [
-                    "Low light conditions to portray the evening atmosphere over the ocean."
-                ],
-                "notes": [
-                    "Setting the tone for the movie with an expansive view of the endless sea."
-                ]
-            }
-        }*/
     script += 'METADATA: ' + scriptJson.metadata + '\n';
 
     for (const scene of scriptJson.scenes) {
