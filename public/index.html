@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treatmentor AI tester</title>
+</head>
+<script src="main.js" defer></script>
+<style>
+    #content {
+        text-align: center;
+    }
+
+    #prompt-area {
+        display: inline-flex;
+    }
+
+    #prompt-area button {
+        margin: 4px;
+    }
+
+    input[type="file"] {
+        display: none;
+    }
+
+    pre {
+        border: 1px solid #ddd;
+        font-family: monospace;
+        white-space: pre-wrap;
+        background-color: #f4f4f4;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<body>
+    <div id="content">
+        <h1>Treatmentor</h1>
+
+        <div id="prompt-area">
+            <button id="file-button-json" onclick="document.getElementById('file-input-json').click()" >Upload Script.json</button>
+            <input id="file-input-json" type="file" accept=".json"></input>
+
+
+            <button id="file-button-txt" onclick="document.getElementById('file-input-txt').click()" >Upload treatment.txt</button>
+            <input id="file-input-txt" type="file"></input>
+
+            <button id="run-prompt">Run</button>
+        </div>
+
+        <p id="error"></p>
+    </div>
+
+    <div>
+        <button onclick="navigator.clipboard.writeText(document.querySelector('pre').textContent)">Copy</button>
+        <pre>No script found. Please upload a valid <b>script.json</b> file.</pre>
+    </div>
+</body>
+</html>

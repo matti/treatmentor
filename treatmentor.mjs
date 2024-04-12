@@ -1,11 +1,12 @@
 import 'dotenv/config';
 
-import { OpenAI } from 'openai';
 import fs from 'fs/promises';
 import yargs from 'yargs'
 import path from 'path';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
+
+import { scriptToTreatment, jsonToString } from './tools.mjs'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -27,7 +28,6 @@ const argv = yargs(process.argv.slice(2))
 
 const args = argv._;
 
-const openai = new OpenAI();
 
 async function main() {
     const scriptJson = JSON.parse(await fs.readFile(args[0]));
@@ -45,37 +45,6 @@ async function main() {
     }
 
     await fs.writeFile(argv.output, response.replace(/\*/g, ''))
-}
-
-async function scriptToTreatment(script, treatments) {
-    const messages = [
-        {role:'system', content: 'You are film treatmentor. You will take example film treatments and a movie script then generate a film treatment for the script similar to the example treatments. Do not output markdown.'},
-        {role:'user', content: 'Treatments: ' + treatments},
-        {role:'user', content: 'Script content: ' + script},
-
-    ]
-
-    const stream = await openai.chat.completions.create({
-        messages: messages,
-        model: 'gpt-4-0125-preview',
-        stream: true,
-        temperature: 0.7
-    });
-
-    return stream
-}
-
-function jsonToString(scriptJson) {
-    let script = "";
-    const sceneText = []
-
-    script += 'METADATA: ' + scriptJson.metadata + '\n';
-
-    for (const scene of scriptJson.scenes) {
-        sceneText.push(`${scene.scene_number}. ${scene.set.type.join('/')}  ${scene.location}\nSynopsis: ${scene.synopsis}\n`);
-    }
-
-    return script + sceneText.join('\n');
 }
 
 async function loadFilesFromDirectory(directory) {
