@@ -68,6 +68,25 @@ document.getElementById('file-input-txt').addEventListener('change', async  func
     location.reload();
 });
 
+document.getElementById('save-btn').addEventListener('click', () => {
+    const fileName = 'treated.txt';
+
+    const blob = new Blob([pre.textContent], { type: 'text/plain' });
+
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+})
+
+
 async function getScript() {
     const res = await fetch('/script.json', {method: 'GET' })
     const json = await res.json();
