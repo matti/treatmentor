@@ -16,7 +16,7 @@ const port = process.env.PORT || 3002;
 const scriptFilePath = path.join(__dirname, 'public', 'script.json');
 const treatmentFilePath = path.join(__dirname, 'public', 'treatment.txt');
 
-const upload = multer({storage: multer.memoryStorage() });
+const upload = multer({ storage: multer.memoryStorage() });
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
@@ -35,7 +35,7 @@ app.post('/run', async (req, res) => {
     }
 
 
-    const stream = await scriptToTreatment(scriptJson, { role:'user', content: `EXAMPLE(s): ${treatmentText}` })
+    const stream = await scriptToTreatment(scriptJson, { role: 'user', content: `EXAMPLE(s): ${treatmentText}` })
 
     for await (const chunk of stream) {
         const delta = (chunk.choices[0]?.delta?.content || "").replace(/\*/g, '')
@@ -49,7 +49,7 @@ app.post('/run', async (req, res) => {
 
 app.post('/upload/json', upload.single('file'), async (req, res) => {
     if (!req.file) {
-        return res.status(400).json({error: 'No files were uploaded.'});
+        return res.status(400).json({ error: 'No files were uploaded.' });
     }
     const file = req.file.buffer;
 
@@ -59,7 +59,7 @@ app.post('/upload/json', upload.single('file'), async (req, res) => {
 
 app.post('/upload/txt', upload.single('file'), async (req, res) => {
     if (!req.file) {
-        return res.status(400).json({error: 'No files were uploaded.'});
+        return res.status(400).json({ error: 'No files were uploaded.' });
     }
     const file = req.file.buffer;
 
@@ -68,4 +68,4 @@ app.post('/upload/txt', upload.single('file'), async (req, res) => {
 })
 
 
-app.listen(port, 'localhost', () => { console.log(`http://localhost:${port}`); });
+app.listen(port, '0.0.0.0', () => { console.log(`http://0.0.0.0:${port}`); });
